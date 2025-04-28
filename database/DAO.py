@@ -3,7 +3,7 @@ from model.connessione import Connessione
 from model.fermata import Fermata
 
 
-class DAO():
+class DAO:
 
     @staticmethod
     def getAllFermate():
@@ -67,7 +67,7 @@ class DAO():
 
         cursor = conn.cursor(dictionary=True)
         query = """select *
-                        from connessione c"""
+                from connessione c"""
 
         cursor.execute(query)
 

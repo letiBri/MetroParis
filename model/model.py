@@ -1,7 +1,7 @@
 from datetime import datetime
-
 from database.DAO import DAO
 import networkx as nx
+
 
 class Model:
     def __init__(self):
@@ -18,24 +18,30 @@ class Model:
         # tic = datetime.now()
         # self.addEdges1()
         # toc = datetime.now()
+        # print("Tempo modo 1:", (toc-tic))
 
+        # self._grafo.clear_edges()
         # tic = datetime.now()
         # self.addEdges2()
         # toc = datetime.now()
+        # print("Tempo modo 2:", (toc - tic))
 
+        # self._grafo.clear_edges()
         tic = datetime.now()
         self.addEdges3()
         toc = datetime.now()
+        print("Tempo modo 3:", (toc - tic))
 
-
-    def addEdges1(self): # ci mette troppo tempo perche itera n * n volte, con n numero di nodi
-        """ Aggiungo gli archi con doppio ciclo sui nodi
-        e testando se per ogni coppia esiste una connessione"""
+    def addEdges1(self):  # ci mette troppo tempo perchè itera n * n volte, con n numero di nodi
+        """
+        Aggiungo gli archi con doppio ciclo sui nodi,
+        e testando se per ogni coppia esiste una connessione
+        """
         for u in self._fermate:
             for v in self._fermate:
                 if DAO.hasConnessione(u, v):
                     self._grafo.add_edge(u, v)
-                    print("Aggiungo arco fra", u, "e", v)
+                    # print("Aggiungo arco fra", u, "e", v)
 
     def addEdges2(self):
         """
@@ -43,9 +49,8 @@ class Model:
         """
         for u in self._fermate:
             for con in DAO.getVicini(u):
-                v = self._idMapFermate[con.id_stazA]
+                v = self._idMapFermate[con.id_stazA]  # accedo alla fermata tramite l'id inserito come chiave nella mappa
                 self._grafo.add_edge(u, v)
-
 
     def addEdges3(self):
         """
@@ -53,10 +58,9 @@ class Model:
         """
         allEdges = DAO.getAllEdges()
         for edge in allEdges:
-            u = self._idMapFermate[edge.id_stazP]
+            u = self._idMapFermate[edge.id_stazP]  # accedo alla fermata tramite l'id inserito come chiave nella mappa
             v = self._idMapFermate[edge.id_stazA]
             self._grafo.add_edge(u, v)
-
 
     def getNumNodi(self):
         return len(self._grafo.nodes)
