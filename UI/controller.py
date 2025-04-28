@@ -8,10 +8,17 @@ class Controller:
         # the model, which implements the logic of the program and holds the data
         self._model = model
 
-    def handleCreaGrafo(self,e):
-        pass
+    def handleCreaGrafo(self, e):
+        self._model.buildGraph()
+        self._view.lst_result.controls.clear()
+        self._view.lst_result.controls.append(ft.Text(f"Grafo correttamente creato"))
+        self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumNodi()} nodi"))
+        self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumArchi()} archi"))
+        self._view.update_page()
 
-    def handleCercaRaggiungibili(self,e):
+
+
+    def handleCercaRaggiungibili(self, e):
         pass
 
     def loadFermate(self, dd: ft.Dropdown()):
