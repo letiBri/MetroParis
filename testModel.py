@@ -2,7 +2,8 @@ from model.fermata import Fermata
 from model.model import Model
 
 model = Model()
-model.buildGraphPesato()
+# model.buildGraph()
+model.buildGraphPesato()  # uso l'estensione
 print("Num nodi: ", model.getNumNodi())
 print("Num archi: ", model.getNumArchi())
 

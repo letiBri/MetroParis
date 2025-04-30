@@ -84,6 +84,7 @@ class DAO:
         result = []
 
         cursor = conn.cursor(dictionary=True)
+        # con questa query conto il numero di linee presenti tra una stazione di partenza e una stazione di arrivo
         query = """select id_stazP, id_stazA, COUNT(*) as n
                     from connessione c 
                     group by id_stazP , id_stazA 
@@ -92,7 +93,7 @@ class DAO:
         cursor.execute(query)
 
         for row in cursor:
-            result.append((row["id_stazP"], row["id_stazA"], row["n"]))
+            result.append((row["id_stazP"], row["id_stazA"], row["n"]))  # creo una tupla
         cursor.close()
         conn.close()
         return result

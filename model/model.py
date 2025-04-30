@@ -11,66 +11,7 @@ class Model:
         for f in self._fermate:
             self._idMapFermate[f.id_fermata] = f  # creo una mappa che mi collega l'id alla fermata
 
-    def getBFSNodesFromTree(self, source):  # visita in ampiezza, source è la fermata che inserisce l'utente
-        tree = nx.bfs_tree(self._grafo, source)  # ritorna un albero orientato costruito a partire da source
-        archi = tree.edges
-        nodi = list(tree.nodes)
-        return nodi[1:]
-
-    def getDFSNodesFromTree(self, source):  # visita in profondità
-        tree = nx.dfs_tree(self._grafo, source)
-        nodi = list(tree.nodes)
-        return nodi[1:]  # escludo la source
-
-    def getBFSNodesFromEdges(self, source):
-        archi = nx.bfs_edges(self._grafo, source)
-        res = []
-        for u, v in archi:
-            res.append(v)  # aggiungo il secondo elemento della tupla per prendere solo i nodi di arrivo dei vari archi, questo mi genera il cammino della ricerca BFS
-        return res
-
-    def getDFSNodesFromEdges(self, source):
-        archi = nx.dfs_edges(self._grafo, source)
-        res = []
-        for u, v in archi:
-            res.append(v)
-        return res
-
-    def buildGraphPesato(self):
-        self._grafo.clear()
-        self._grafo.add_nodes_from(self._fermate)
-        self.addEdgesPesatiV2()
-
-    def addEdgesPesati(self):
-        allEdges = DAO.getAllEdges()
-        for edge in allEdges:
-            u = self._idMapFermate[edge.id_stazP]  # accedo alla fermata tramite l'id inserito come chiave nella mappa
-            v = self._idMapFermate[edge.id_stazA]
-
-            if self._grafo.has_edge(u, v):
-                self._grafo[u][v]["weight"] += 1
-            else:
-                self._grafo.add_edge(u, v, weight=1)
-
-    def addEdgesPesatiV2(self):
-        self._grafo.clear_edges()
-        allEdgesPesati = DAO.getAllEdgesPesati()
-
-        for e in allEdgesPesati:
-            self._grafo.add_edge(
-                self._idMapFermate[e[0]],
-                self._idMapFermate[e[1]],
-                weight=e[2]
-            )
-
-    def getArchiPesoMaggiore(self):
-        edges = self._grafo.edges(data=True)
-        res = []
-        for e in edges:
-            if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:
-                res.append(e)
-        return res
-
+    # per costruire il grafo
     def buildGraph(self):
         # aggiungiamo i nodi
         self._grafo.add_nodes_from(self._fermate)  # creo i nodi partendo dalla lista di fermate prese dal DAO
@@ -127,6 +68,70 @@ class Model:
 
     def getNumArchi(self):
         return len(self._grafo.edges)
+
+    # visita del grafo
+    def getBFSNodesFromTree(self, source):  # visita in ampiezza, source è la fermata di partenza che inserisce l'utente
+        tree = nx.bfs_tree(self._grafo, source)  # ritorna un albero orientato costruito a partire da source
+        archi = tree.edges
+        nodi = list(tree.nodes)
+        return nodi[1:]  # escludo la source
+
+    def getDFSNodesFromTree(self, source):  # visita in profondità
+        tree = nx.dfs_tree(self._grafo, source)
+        nodi = list(tree.nodes)
+        return nodi[1:]  # escludo la source
+
+    def getBFSNodesFromEdges(self, source):
+        archi = nx.bfs_edges(self._grafo, source)  # mi restituisce direttamente gli archi ottenuto attraverso il metodo bfs
+        res = []
+        for u, v in archi:
+            res.append(
+                v)  # aggiungo il secondo elemento della tupla per prendere solo i nodi di arrivo dei vari archi, questo mi genera il cammino della ricerca BFS
+        return res
+
+    def getDFSNodesFromEdges(self, source):
+        archi = nx.dfs_edges(self._grafo,
+                             source)  # mi restituisce direttamente gli archi ottenuto attraverso il metodo dfs
+        res = []
+        for u, v in archi:
+            res.append(v)
+        return res
+
+    # per le estensioni
+    def buildGraphPesato(self):
+        self._grafo.clear()  # pulisco il grafo perchè stiamo usando lo stesso creato senza considerare i pesi
+        self._grafo.add_nodes_from(self._fermate)  # riempio i nodi del grafo con le fermate salvate dal DAO
+        self.addEdgesPesatiV2()
+
+    def addEdgesPesati(self):
+        allEdges = DAO.getAllEdges()
+        for edge in allEdges:
+            u = self._idMapFermate[
+                edge.id_stazP]  # accedo alla fermata tramite l'id inserito come chiave nella mappa
+            v = self._idMapFermate[edge.id_stazA]
+
+            if self._grafo.has_edge(u, v):  # metodo che restituisce True se l'arco appartiene al grafo
+                self._grafo[u][v][
+                    "weight"] += 1  # aumento di 1 il peso dell'arco, ogni volta che trovo una liena tra quelle due fermate
+            else:
+                self._grafo.add_edge(u, v,
+                                     weight=1)  # se non trovo l'arco, allora lo aggiungo e gli associo il peso 1
+
+    def addEdgesPesatiV2(self):
+        self._grafo.clear_edges()
+        allEdgesPesati = DAO.getAllEdgesPesati()
+
+        for e in allEdgesPesati:
+            self._grafo.add_edge(self._idMapFermate[e[0]], self._idMapFermate[e[1]],
+                                 weight=e[2])  # il peso diventa il count della query fatta nel DAO
+
+    def getArchiPesoMaggiore(self):
+        edges = self._grafo.edges(data=True)
+        res = []
+        for e in edges:
+            if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:
+                res.append(e)
+        return res
 
     @property
     def fermate(self):
