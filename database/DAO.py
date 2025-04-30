@@ -84,13 +84,15 @@ class DAO:
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """select *
-                    from connessione c"""
+        query = """select id_stazP, id_stazA, COUNT(*) as n
+                    from connessione c 
+                    group by id_stazP , id_stazA 
+                    order by n desc"""
 
         cursor.execute(query)
 
         for row in cursor:
-            result.append(Connessione(**row))
+            result.append((row["id_stazP"], row["id_stazA"], row["n"]))
         cursor.close()
         conn.close()
         return result
