@@ -4,8 +4,8 @@ from dataclasses import dataclass
 class Fermata:
     id_fermata: int
     nome: str
-    coordX: int
-    coordY: int
+    coordX: float
+    coordY: float
 
 
     def __hash__(self):

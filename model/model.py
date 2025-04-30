@@ -11,6 +11,43 @@ class Model:
         for f in self._fermate:
             self._idMapFermate[f.id_fermata] = f  # creo una mappa che mi collega l'id alla fermata
 
+    def getBFSNodesFromTree(self, source):  # source è la fermata che inserisce l'utente
+        tree = nx.bfs_tree(self._grafo, source)  # ritorna un albero orientato costruito a partire da source
+        archi = tree.edges
+        nodi = list(tree.nodes)
+        return nodi[1:]
+
+    def getDFSNodesFromTree(self, source):  # visita in profondità
+        tree = nx.dfs_tree(self._grafo, source)
+        nodi = list(tree.nodes)
+        return nodi[1:]  # escludo la source
+
+    def getBFSNodesFromEdges(self, source):
+        archi = nx.bfs_edges(self._grafo, source)
+        res = []
+        for u, v in archi:
+            res.append(v)  # aggiungo il secondo elemento della tupla per prendere solo i nodi di arrivo dei vari archi, questo mi genera il cammino della ricerca BFS
+        return res
+
+    def getDFSNodesFromEdges(self, source):
+        archi = nx.dfs_edges(self._grafo, source)
+        res = []
+        for u, v in archi:
+            res.append(v)
+        return res
+
+    def buildGraphPesato(self):
+        self._grafo.clear()
+        self._grafo.add_nodes_from(self._fermate)
+        self.allEdgesPesato()
+
+    def allEdgesPesato(self):
+        allEdges = DAO.getAllEdges()
+        for edge in allEdges:
+            u = self._idMapFermate[edge.id_stazP]  # accedo alla fermata tramite l'id inserito come chiave nella mappa
+            v = self._idMapFermate[edge.id_stazA]
+            self._grafo.add_edge(u, v)
+
     def buildGraph(self):
         # aggiungiamo i nodi
         self._grafo.add_nodes_from(self._fermate)  # creo i nodi partendo dalla lista di fermate prese dal DAO

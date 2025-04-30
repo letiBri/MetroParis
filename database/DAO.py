@@ -76,3 +76,21 @@ class DAO:
         cursor.close()
         conn.close()
         return result
+
+    @staticmethod
+    def getAllEdgesPesati():
+        conn = DBConnect.get_connection()
+
+        result = []
+
+        cursor = conn.cursor(dictionary=True)
+        query = """select *
+                    from connessione c"""
+
+        cursor.execute(query)
+
+        for row in cursor:
+            result.append(Connessione(**row))
+        cursor.close()
+        conn.close()
+        return result

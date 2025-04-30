@@ -4,6 +4,8 @@ import flet as ft
 class Controller:
     def __init__(self, view, model):
         # the view, with the graphical elements of the UI
+        self._fermataArrivo = None
+        self._fermataPartenza = None
         self._view = view
         # the model, which implements the logic of the program and holds the data
         self._model = model
@@ -14,10 +16,22 @@ class Controller:
         self._view.lst_result.controls.append(ft.Text(f"Grafo correttamente creato!"))
         self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumNodi()} nodi."))
         self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumArchi()} archi."))
+        self._view._btnCalcola.disabled = False  # abilito il bottone cerca raggiungibili solo quando ho creato il grafo
         self._view.update_page()
 
     def handleCercaRaggiungibili(self, e):
-        pass
+        if self._fermataPartenza is None:  # con il metodo read_DD_Partenza(self,e) viene aggiornata quando seleziono
+            self._view.lst_result.controls.clear()
+            self._view.lst_result.controls.append(ft.Text(f"Attenzione: stazione di partenza non selezionata!", color=red))
+            self._view.update_page()
+            return
+        nodes = self._model.getBFSNodesFromEdges(self._fermataPartenza)
+        self._view.lst_result.controls.clear()
+        self._view.lst_result.controls.append(ft.Text(f"Di seguito, le stazioni raggiungibili a partire da {self._fermataPartenza}"))
+        for n in nodes:
+            self._view.lst_result.controls.append(ft.Text(n))
+        self._view.update_page()
+        return
 
     def loadFermate(self, dd: ft.Dropdown()):
         fermate = self._model.fermate
