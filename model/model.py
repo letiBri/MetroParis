@@ -129,7 +129,7 @@ class Model:
         edges = self._grafo.edges(data=True)
         res = []
         for e in edges:
-            if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:
+            if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:  # trovo gli archi con peso maggiore di 1, quindi con più di una linea che collega le due fermate
                 res.append(e)
         return res
 
