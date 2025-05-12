@@ -54,7 +54,6 @@ class Controller:
         self._view.update_page()
         return
 
-
     def loadFermate(self, dd: ft.Dropdown()):
         fermate = self._model.fermate
 
