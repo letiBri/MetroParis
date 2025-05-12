@@ -103,7 +103,7 @@ class Model:
         self._grafo.clear()  # pulisco il grafo perchè stiamo usando lo stesso creato senza considerare i pesi
         self._grafo.add_nodes_from(self._fermate)  # riempio i nodi del grafo con le fermate salvate dal DAO
         # self.addEdgesPesatiV2()
-        self.addEdgesPesatiTempi()
+        self.addEdgesPesatiTempi()  # per i cammini minimi
 
     def addEdgesPesati(self):
         allEdges = DAO.getAllEdges()
@@ -142,10 +142,10 @@ class Model:
         """
         self._grafo.clear_edges()
         allEdges = DAO.getAllEdgesVel()
-        for e in allEdges:
-            u = self._idMapFermate[e[0]]  # il primo elemento della tupla, stazione di partenza
+        for e in allEdges:  # e è una tupla di tre elementi: id_StazP, id_StazA, velocità dell'arco
+            u = self._idMapFermate[e[0]]  # il primo elemento della tupla, accedo alla stazione di partenza con l'idMap
             v = self._idMapFermate[e[1]]  # stazione di arrivo
-            peso = getTraversalTime(u, v, e[2])
+            peso = getTraversalTime(u, v, e[2])  # e[2] è la velocità
             self._grafo.add_edge(u, v, weight=peso)
 
     # per i cammini minimi

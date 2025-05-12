@@ -11,7 +11,8 @@ class Controller:
         self._model = model
 
     def handleCreaGrafo(self, e):
-        self._model.buildGraph()
+        # self._model.buildGraph()
+        self._model.buildGraphPesato()
         self._view.lst_result.controls.clear()
         self._view.lst_result.controls.append(ft.Text(f"Grafo correttamente creato!"))
         self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumNodi()} nodi."))
@@ -48,7 +49,7 @@ class Controller:
             self._view.update_page()
             return
         self._view.lst_result.controls.clear()
-        self._view.lst_result.controls.append(ft.Text(f"Ho trovato un cammino tra {self._fermataPartenza} e {self._fermataArrivo} che impiega {totTime} minuti", color="green"))
+        self._view.lst_result.controls.append(ft.Text(f"Ho trovato un cammino tra {self._fermataPartenza} e {self._fermataArrivo} che impiega {round(totTime, 3)} minuti", color="green"))
         for n in path:
             self._view.lst_result.controls.append(ft.Text(n, color="green"))
         self._view.update_page()

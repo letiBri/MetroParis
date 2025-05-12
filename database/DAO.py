@@ -105,6 +105,8 @@ class DAO:
         result = []
 
         cursor = conn.cursor(dictionary=True)
+
+        # seleziono l'arco con la velocità max quando fra due nodi ci sono più linee
         query = """select c.id_stazP, c.id_stazA, max(l.velocita) as v
                     from connessione c, linea l 
                     where c.id_linea = l.id_linea 
@@ -114,7 +116,7 @@ class DAO:
         cursor.execute(query)
 
         for row in cursor:
-            result.append((row["id_stazP"], row["id_stazA"], row["v"]))  # metto in una tupla
+            result.append((row["id_stazP"], row["id_stazA"], row["v"]))  # metto in una tupla le due stazioni e la relativa veloità della linea
         cursor.close()
         conn.close()
         return result
