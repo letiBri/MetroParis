@@ -1,6 +1,7 @@
 from datetime import datetime
 from database.DAO import DAO
 import networkx as nx
+import geopy.distance
 
 
 class Model:
@@ -101,7 +102,8 @@ class Model:
     def buildGraphPesato(self):
         self._grafo.clear()  # pulisco il grafo perchè stiamo usando lo stesso creato senza considerare i pesi
         self._grafo.add_nodes_from(self._fermate)  # riempio i nodi del grafo con le fermate salvate dal DAO
-        self.addEdgesPesatiV2()
+        # self.addEdgesPesatiV2()
+        self.addEdgesPesatiTempi()
 
     def addEdgesPesati(self):
         allEdges = DAO.getAllEdges()
@@ -112,7 +114,7 @@ class Model:
 
             if self._grafo.has_edge(u, v):  # metodo che restituisce True se l'arco appartiene al grafo
                 self._grafo[u][v][
-                    "weight"] += 1  # aumento di 1 il peso dell'arco, ogni volta che trovo una liena tra quelle due fermate
+                    "weight"] += 1  # aumento di 1 il peso dell'arco, ogni volta che trovo una linea tra quelle due fermate
             else:
                 self._grafo.add_edge(u, v,
                                      weight=1)  # se non trovo l'arco, allora lo aggiungo e gli associo il peso 1
@@ -133,7 +135,31 @@ class Model:
                 res.append(e)
         return res
 
+    # per i cammini minimi
+    def addEdgesPesatiTempi(self):
+        """
+        aggiunge archi con peso uguale al tempo di percorrenza dell'arco
+        """
+        self._grafo.clear_edges()
+        allEdges = DAO.getAllEdgesVel()
+        for e in allEdges:
+            u = self._idMapFermate[e[0]]  # il primo elemento della tupla, stazione di partenza
+            v = self._idMapFermate[e[1]]  # stazione di arrivo
+            peso = getTraversalTime(u, v, e[2])
+            self._grafo.add_edge(u, v, weight=peso)
+
+    # per i cammini minimi
+    def getShortestPath(self, u, v):
+        return nx.single_source_dijkstra(self._grafo, u, v)  # restituisce distanza e percorso, come lista di nodi
+
+
     @property
     def fermate(self):
         return self._fermate
 
+
+def getTraversalTime(u, v, vel):  # uso di libreria geopy per trovare le distanze
+    dist = geopy.distance.distance((u.coordX, u.coordY), (v.coordX, v.coordY)).km  # passo come argomenti due tuple con le rispettive coordinate dei due nodi
+    # mi restituisce la distanza in chilometri
+    time = dist / vel * 60  # mi restituisce il tempo in minuti
+    return time  # calcola il tempo di percorrenza di un arco dati due punti e la relativa velocità

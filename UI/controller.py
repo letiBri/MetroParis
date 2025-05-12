@@ -17,21 +17,43 @@ class Controller:
         self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumNodi()} nodi."))
         self._view.lst_result.controls.append(ft.Text(f"Il grafo contiene {self._model.getNumArchi()} archi."))
         self._view._btnCalcola.disabled = False  # abilito il bottone cerca raggiungibili solo quando ho creato il grafo
+        self._view._btnCercaPercorso.disabled = False
         self._view.update_page()
 
     def handleCercaRaggiungibili(self, e):
         if self._fermataPartenza is None:  # con il metodo read_DD_Partenza(self,e) viene aggiornata quando seleziono
             self._view.lst_result.controls.clear()
-            self._view.lst_result.controls.append(ft.Text(f"Attenzione: stazione di partenza non selezionata!", color=red))
+            self._view.lst_result.controls.append(ft.Text(f"Attenzione: stazione di partenza non selezionata!", color="red"))
             self._view.update_page()
             return
         nodes = self._model.getBFSNodesFromEdges(self._fermataPartenza)
         self._view.lst_result.controls.clear()
-        self._view.lst_result.controls.append(ft.Text(f"Di seguito, le stazioni raggiungibili a partire da {self._fermataPartenza}"))
+        self._view.lst_result.controls.append(ft.Text(f"Di seguito, le stazioni raggiungibili a partire da {self._fermataPartenza}:"))
         for n in nodes:
             self._view.lst_result.controls.append(ft.Text(n))
         self._view.update_page()
         return
+
+    # per il punto sui cammini minimi
+    def handleCerca(self, e):
+        if self._fermataPartenza is None or self._fermataArrivo is None:
+            self._view.lst_result.controls.clear()
+            self._view.lst_result.controls.append(ft.Text(f"Attenzione: selezionare fermate di partenza e di arrivo!", color="red"))
+            self._view.update_page()
+            return
+        totTime, path = self._model.getShortestPath(self._fermataPartenza, self._fermataArrivo)
+        if len(path) == 0:
+            self._view.lst_result.controls.clear()
+            self._view.lst_result.controls.append(ft.Text(f"Non ho trovato un cammino tra {self._fermataPartenza} e {self._fermataArrivo}", color="red"))
+            self._view.update_page()
+            return
+        self._view.lst_result.controls.clear()
+        self._view.lst_result.controls.append(ft.Text(f"Ho trovato un cammino tra {self._fermataPartenza} e {self._fermataArrivo} che impiega {totTime} minuti", color="green"))
+        for n in path:
+            self._view.lst_result.controls.append(ft.Text(n, color="green"))
+        self._view.update_page()
+        return
+
 
     def loadFermate(self, dd: ft.Dropdown()):
         fermate = self._model.fermate
